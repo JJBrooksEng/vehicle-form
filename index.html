@@ -198,7 +198,12 @@
           'Content-Type': 'application/json'
         }
       })
-      .then(response => response.text())
+      ..then(response => response.text())
+.then(data => {
+  alert("Server said: " + data);
+  console.log(data);
+})
+
       .then(data => {
         alert('Form submitted successfully!');
         document.getElementById('damage-form').reset();
