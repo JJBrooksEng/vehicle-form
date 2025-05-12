@@ -35,6 +35,7 @@
 <body>
   <h2>Vehicle Damage Report</h2>
   <form id="damage-form">
+    <!-- form fields as before -->
     <div class="form-group">
       <label for="customer-name">Customer Name:</label>
       <input type="text" id="customer-name" name="customer-name">
@@ -191,23 +192,20 @@
         imageDataURL: imageDataURL
       };
 
-      fetch('https://script.google.com/macros/s/AKfycbwOXflSL4vsYeeRCB39W8DrkSzzbEju8BeYpvuyPWF0L_xXkmpG1Ig64F1Qoun8w8cD/exec', {
+      fetch('https://script.google.com/macros/s/AKfycbyMqnP3k7DRQaaEBVBrN8ZYIMc6wTFs5YPK8lXMoCyU4RPOJPViQvBcdpdGYeHh67zy/exec', {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: {
           'Content-Type': 'application/json'
         }
       })
-      ..then(response => response.text())
-.then(data => {
-  alert("Server said: " + data);
-  console.log(data);
-})
-
+      .then(response => response.text())
       .then(data => {
-        alert('Form submitted successfully!');
-        document.getElementById('damage-form').reset();
-        image.onload();
+        alert("Server response: " + data);
+        if (data.includes('Success')) {
+          document.getElementById('damage-form').reset();
+          image.onload();
+        }
       })
       .catch(error => {
         alert('Submission failed. Please try again.');
