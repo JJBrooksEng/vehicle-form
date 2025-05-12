@@ -39,7 +39,58 @@
   <h2>Vehicle Damage Report</h2>
   <iframe name="hiddenFrame" id="hiddenFrame"></iframe>
   <form id="damage-form" method="POST" target="hiddenFrame" action="https://script.google.com/macros/s/AKfycbw7IXCu_sSU39nkR8QD-ap_7LXzhAeCQkWq1ok91Q-rdp8U3QOveQbZBE4GVHAho0Gq/exec">
-    <!-- form fields -->
+    <div class="form-group">
+      <label for="customer-name">Customer Name:</label>
+      <input type="text" id="customer-name" name="customerName">
+    </div>
+    <div class="form-group">
+      <label for="contact-number">Customer Contact Number:</label>
+      <input type="text" id="contact-number" name="contactNumber">
+    </div>
+    <div class="form-group">
+      <label for="email">Customer Email Address:</label>
+      <input type="email" id="email" name="email">
+    </div>
+    <div class="form-group">
+      <label for="vehicle-make">Vehicle Make:</label>
+      <input type="text" id="vehicle-make" name="vehicleMake">
+    </div>
+    <div class="form-group">
+      <label for="vehicle-model">Vehicle Model:</label>
+      <input type="text" id="vehicle-model" name="vehicleModel">
+    </div>
+    <div class="form-group">
+      <label for="vehicle-reg">Vehicle Registration:</label>
+      <input type="text" id="vehicle-reg" name="vehicleReg">
+    </div>
+    <div class="form-group">
+      <label for="repair-description">Description of Repairs Required:</label>
+      <textarea id="repair-description" name="repairDescription" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="replacement-parts">Replacement Parts Required:</label>
+      <textarea id="replacement-parts" name="replacementParts" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="paint-type">Paint Type (Pearl, Metallic etc):</label>
+      <input type="text" id="paint-type" name="paintType">
+    </div>
+    <div class="form-group">
+      <label for="estimated-hours">Estimated Workshop Hours:</label>
+      <input type="number" id="estimated-hours" name="estimatedHours" step="0.1">
+    </div>
+    <div class="form-group">
+      <label for="available-dates">Dates Available:</label>
+      <input type="text" id="available-dates" name="availableDates">
+    </div>
+    <div class="form-group">
+      <label for="price-agreed">Price Agreed (if applicable):</label>
+      <input type="text" id="price-agreed" name="priceAgreed">
+    </div>
+    <div class="form-group">
+      <label>Tap or draw to mark damage on the diagram:</label>
+      <canvas id="damageCanvas"></canvas>
+    </div>
     <input type="hidden" id="image-data" name="imageDataURL">
     <button type="submit">Submit</button>
     <button type="button" onclick="downloadImage()">Download Annotated Image</button>
@@ -59,6 +110,63 @@
       canvas.style.height = 'auto';
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     };
+
+    let drawing = false;
+
+    function getPos(evt) {
+      const rect = canvas.getBoundingClientRect();
+      if (evt.touches) {
+        evt = evt.touches[0];
+      }
+      return {
+        x: (evt.clientX - rect.left) * (canvas.width / rect.width),
+        y: (evt.clientY - rect.top) * (canvas.height / rect.height)
+      };
+    }
+
+    canvas.addEventListener('mousedown', e => {
+      const pos = getPos(e);
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+    });
+
+    canvas.addEventListener('mousemove', e => {
+      if (!drawing) return;
+      const pos = getPos(e);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      drawing = false;
+      ctx.closePath();
+    });
+
+    canvas.addEventListener('touchstart', e => {
+      e.preventDefault();
+      const pos = getPos(e);
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+    });
+
+    canvas.addEventListener('touchmove', e => {
+      e.preventDefault();
+      const pos = getPos(e);
+      if (!drawing) return;
+      ctx.lineTo(pos.x, pos.y);
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+
+    canvas.addEventListener('touchend', () => {
+      drawing = false;
+      ctx.closePath();
+    });
 
     function downloadImage() {
       const link = document.createElement('a');
