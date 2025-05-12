@@ -176,28 +176,24 @@
 
       const imageDataURL = canvas.toDataURL();
 
-      const payload = {
-        customerName: document.getElementById('customer-name').value,
-        contactNumber: document.getElementById('contact-number').value,
-        email: document.getElementById('email').value,
-        vehicleMake: document.getElementById('vehicle-make').value,
-        vehicleModel: document.getElementById('vehicle-model').value,
-        vehicleReg: document.getElementById('vehicle-reg').value,
-        repairDescription: document.getElementById('repair-description').value,
-        replacementParts: document.getElementById('replacement-parts').value,
-        paintType: document.getElementById('paint-type').value,
-        estimatedHours: document.getElementById('estimated-hours').value,
-        availableDates: document.getElementById('available-dates').value,
-        priceAgreed: document.getElementById('price-agreed').value,
-        imageDataURL: imageDataURL
-      };
+      const formData = new FormData();
+      formData.append('customerName', document.getElementById('customer-name').value);
+      formData.append('contactNumber', document.getElementById('contact-number').value);
+      formData.append('email', document.getElementById('email').value);
+      formData.append('vehicleMake', document.getElementById('vehicle-make').value);
+      formData.append('vehicleModel', document.getElementById('vehicle-model').value);
+      formData.append('vehicleReg', document.getElementById('vehicle-reg').value);
+      formData.append('repairDescription', document.getElementById('repair-description').value);
+      formData.append('replacementParts', document.getElementById('replacement-parts').value);
+      formData.append('paintType', document.getElementById('paint-type').value);
+      formData.append('estimatedHours', document.getElementById('estimated-hours').value);
+      formData.append('availableDates', document.getElementById('available-dates').value);
+      formData.append('priceAgreed', document.getElementById('price-agreed').value);
+      formData.append('imageDataURL', imageDataURL);
 
-      fetch('https://corsproxy.io/?https://script.google.com/macros/s/AKfycbw7IXCu_sSU39nkR8QD-ap_7LXzhAeCQkWq1ok91Q-rdp8U3QOveQbZBE4GVHAho0Gq/exec', {
+      fetch('https://script.google.com/macros/s/AKfycbw7IXCu_sSU39nkR8QD-ap_7LXzhAeCQkWq1ok91Q-rdp8U3QOveQbZBE4GVHAho0Gq/exec', {
         method: 'POST',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        body: formData
       })
       .then(response => response.text())
       .then(data => {
