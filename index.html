@@ -30,13 +30,17 @@
       font-size: 1em;
       box-sizing: border-box;
     }
+    iframe {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <h2>Vehicle Damage Report</h2>
-  <form id="damage-form">
+  <iframe name="hiddenFrame" id="hiddenFrame"></iframe>
+  <form id="damage-form" method="POST" target="hiddenFrame" action="https://script.google.com/macros/s/AKfycbw7IXCu_sSU39nkR8QD-ap_7LXzhAeCQkWq1ok91Q-rdp8U3QOveQbZBE4GVHAho0Gq/exec">
     <!-- form fields -->
-    <!-- [fields omitted for brevity] -->
+    <input type="hidden" id="image-data" name="imageDataURL">
     <button type="submit">Submit</button>
     <button type="button" onclick="downloadImage()">Download Annotated Image</button>
   </form>
@@ -56,9 +60,6 @@
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     };
 
-    // Drawing functions (unchanged)
-    // ...
-
     function downloadImage() {
       const link = document.createElement('a');
       link.download = 'annotated-vehicle.png';
@@ -66,38 +67,13 @@
       link.click();
     }
 
-    // ✅ Listen for success message from Apps Script Web App
-    window.addEventListener("message", function(event) {
-      if (event.data === "Success") {
+    document.getElementById('damage-form').addEventListener('submit', function(event) {
+      document.getElementById('image-data').value = canvas.toDataURL();
+      setTimeout(() => {
         alert("Form submitted successfully!");
         document.getElementById('damage-form').reset();
         image.onload();
-      }
-    });
-
-    document.getElementById('damage-form').addEventListener('submit', function(event) {
-      event.preventDefault();
-
-      const imageDataURL = canvas.toDataURL();
-      const formData = new FormData();
-      formData.append('customerName', document.getElementById('customer-name').value);
-      formData.append('contactNumber', document.getElementById('contact-number').value);
-      formData.append('email', document.getElementById('email').value);
-      formData.append('vehicleMake', document.getElementById('vehicle-make').value);
-      formData.append('vehicleModel', document.getElementById('vehicle-model').value);
-      formData.append('vehicleReg', document.getElementById('vehicle-reg').value);
-      formData.append('repairDescription', document.getElementById('repair-description').value);
-      formData.append('replacementParts', document.getElementById('replacement-parts').value);
-      formData.append('paintType', document.getElementById('paint-type').value);
-      formData.append('estimatedHours', document.getElementById('estimated-hours').value);
-      formData.append('availableDates', document.getElementById('available-dates').value);
-      formData.append('priceAgreed', document.getElementById('price-agreed').value);
-      formData.append('imageDataURL', imageDataURL);
-
-      fetch('https://script.google.com/macros/s/AKfycbw7IXCu_sSU39nkR8QD-ap_7LXzhAeCQkWq1ok91Q-rdp8U3QOveQbZBE4GVHAho0Gq/exec', {
-        method: 'POST',
-        body: formData
-      }); // No .then(): we wait for the message from Apps Script
+      }, 500);
     });
   </script>
 </body>
