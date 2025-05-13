@@ -3,50 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>Vehicle Damage Form</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      padding: 20px;
+  <style>$1
+    @media screen and (max-width: 600px) {
+      form {
+        padding: 15px;
+      }
+      canvas {
+        width: 100% !important;
+        height: auto !important;
+      }
     }
-    form {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 600px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-    }
-    input[type="text"],
-    input[type="email"] {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    canvas {
-      display: block;
-      margin: 10px 0;
-      border: 1px solid #000;
-    }
-    button {
-      padding: 10px 15px;
-      background: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-  </style>
 </head>
 <body>
   <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
@@ -125,6 +91,32 @@
       ctx.lineTo(e.offsetX, e.offsetY);
       ctx.stroke();
       [lastX, lastY] = [e.offsetX, e.offsetY];
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      lastX = touch.clientX - rect.left;
+      lastY = touch.clientY - rect.top;
+      drawing = true;
+    });
+
+    canvas.addEventListener('touchend', () => drawing = false);
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (!drawing) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      [lastX, lastY] = [x, y];
     });
 
     function prepareImage() {
