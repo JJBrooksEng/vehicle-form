@@ -1,188 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vehicle Damage Annotation</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 1em;
-      max-width: 600px;
-      margin: auto;
-    }
-    canvas {
-      border: 1px solid #ccc;
-      width: 100%;
-      height: auto;
-      touch-action: none;
-    }
-    .form-group {
-      margin-bottom: 1em;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.5em;
-    }
-    input, textarea, button {
-      width: 100%;
-      padding: 0.5em;
-      font-size: 1em;
-      box-sizing: border-box;
-    }
-    iframe {
-      display: none;
-    }
-  </style>
+  <title>Vehicle Damage Report</title>
 </head>
 <body>
-  <h2>Vehicle Damage Report</h2>
-  <iframe name="hiddenFrame" id="hiddenFrame"></iframe>
-  <form id="damage-form" method="POST" target="hiddenFrame" action="https://script.google.com/macros/s/AKfycbxtZqM0dGH6rI2GRXR4dA3aBnsdWCvLhk5EJ7tYMG4bmTu9RNA0UeQfeK8hzK8x-ij4/exec">
-    <div class="form-group">
-      <label for="customer-name">Customer Name:</label>
-      <input type="text" id="customer-name" name="customerName">
-    </div>
-    <div class="form-group">
-      <label for="contact-number">Customer Contact Number:</label>
-      <input type="text" id="contact-number" name="contactNumber">
-    </div>
-    <div class="form-group">
-      <label for="email">Customer Email Address:</label>
-      <input type="email" id="email" name="email">
-    </div>
-    <div class="form-group">
-      <label for="vehicle-make">Vehicle Make:</label>
-      <input type="text" id="vehicle-make" name="vehicleMake">
-    </div>
-    <div class="form-group">
-      <label for="vehicle-model">Vehicle Model:</label>
-      <input type="text" id="vehicle-model" name="vehicleModel">
-    </div>
-    <div class="form-group">
-      <label for="vehicle-reg">Vehicle Registration:</label>
-      <input type="text" id="vehicle-reg" name="vehicleReg">
-    </div>
-    <div class="form-group">
-      <label for="repair-description">Description of Repairs Required:</label>
-      <textarea id="repair-description" name="repairDescription" rows="3"></textarea>
-    </div>
-    <div class="form-group">
-      <label for="replacement-parts">Replacement Parts Required:</label>
-      <textarea id="replacement-parts" name="replacementParts" rows="3"></textarea>
-    </div>
-    <div class="form-group">
-      <label for="paint-type">Paint Type (Pearl, Metallic etc):</label>
-      <input type="text" id="paint-type" name="paintType">
-    </div>
-    <div class="form-group">
-      <label for="estimated-hours">Estimated Workshop Hours:</label>
-      <input type="number" id="estimated-hours" name="estimatedHours" step="0.1">
-    </div>
-    <div class="form-group">
-      <label for="available-dates">Dates Available:</label>
-      <input type="text" id="available-dates" name="availableDates">
-    </div>
-    <div class="form-group">
-      <label for="price-agreed">Price Agreed (if applicable):</label>
-      <input type="text" id="price-agreed" name="priceAgreed">
-    </div>
-    <div class="form-group">
-      <label>Tap or draw to mark damage on the diagram:</label>
-      <canvas id="damageCanvas"></canvas>
-    </div>
-    <input type="hidden" id="image-data" name="imageDataURL">
-    <button type="submit">Submit</button>
-    <button type="button" onclick="downloadImage()">Download Annotated Image</button>
+  <form id="damage-form">
+    <label>Customer Name: <input type="text" name="customerName" required></label><br>
+    <label>Contact Number: <input type="text" name="contactNumber"></label><br>
+    <label>Email Address: <input type="email" name="email"></label><br>
+    <label>Vehicle Make: <input type="text" name="vehicleMake"></label><br>
+    <label>Vehicle Model: <input type="text" name="vehicleModel"></label><br>
+    <label>Vehicle Registration: <input type="text" name="vehicleReg"></label><br>
+    <label>Description of Repairs Required:<br><textarea name="repairDescription"></textarea></label><br>
+    <label>Replacement Parts Required:<br><textarea name="replacementParts"></textarea></label><br>
+    <label>Paint Type: <input type="text" name="paintType"></label><br>
+    <label>Estimated Workshop Hours: <input type="text" name="estimatedHours"></label><br>
+    <label>Dates Available: <input type="text" name="availableDates"></label><br>
+    <label>Price Agreed (if applicable): <input type="text" name="priceAgreed"></label><br><br>
+
+    <canvas id="damageCanvas" width="300" height="150" style="border:1px solid #000000;"></canvas><br>
+    <button type="button" onclick="submitForm()">Submit</button>
   </form>
 
   <script>
-    const canvas = document.getElementById('damageCanvas');
-    const ctx = canvas.getContext('2d');
-    const image = new Image();
-    image.crossOrigin = 'anonymous';
-    image.src = 'https://i.ibb.co/v6yXvSrR/Vehicle-Diagram.jpg';
+    function submitForm() {
+      const form = document.getElementById('damage-form');
+      const formData = new FormData(form);
 
-    image.onload = () => {
-      canvas.width = image.width;
-      canvas.height = image.height;
-      canvas.style.width = '100%';
-      canvas.style.height = 'auto';
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    };
+      const canvas = document.getElementById('damageCanvas');
+      const imageDataURL = canvas.toDataURL('image/png');
+      formData.append('imageDataURL', imageDataURL);
 
-    let drawing = false;
-
-    function getPos(evt) {
-      const rect = canvas.getBoundingClientRect();
-      if (evt.touches) {
-        evt = evt.touches[0];
-      }
-      return {
-        x: (evt.clientX - rect.left) * (canvas.width / rect.width),
-        y: (evt.clientY - rect.top) * (canvas.height / rect.height)
-      };
+      fetch("https://script.google.com/macros/s/AKfycbzp7mV1TmBJBOrgXg78CQUeK-c9UUQpTFkbz5jGkDEJVSeFRxd9Sv9N1vMqi8_DqT0h/exec", {
+        method: "POST",
+        body: formData,
+      })
+      .then(response => response.text())
+      .then(result => alert("Form submitted successfully."))
+      .catch(error => alert("Submission failed."));
     }
-
-    canvas.addEventListener('mousedown', e => {
-      const pos = getPos(e);
-      drawing = true;
-      ctx.beginPath();
-      ctx.moveTo(pos.x, pos.y);
-    });
-
-    canvas.addEventListener('mousemove', e => {
-      if (!drawing) return;
-      const pos = getPos(e);
-      ctx.lineTo(pos.x, pos.y);
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    });
-
-    canvas.addEventListener('mouseup', () => {
-      drawing = false;
-      ctx.closePath();
-    });
-
-    canvas.addEventListener('touchstart', e => {
-      e.preventDefault();
-      const pos = getPos(e);
-      drawing = true;
-      ctx.beginPath();
-      ctx.moveTo(pos.x, pos.y);
-    });
-
-    canvas.addEventListener('touchmove', e => {
-      e.preventDefault();
-      const pos = getPos(e);
-      if (!drawing) return;
-      ctx.lineTo(pos.x, pos.y);
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    });
-
-    canvas.addEventListener('touchend', () => {
-      drawing = false;
-      ctx.closePath();
-    });
-
-    function downloadImage() {
-      const link = document.createElement('a');
-      link.download = 'annotated-vehicle.png';
-      link.href = canvas.toDataURL();
-      link.click();
-    }
-
-    document.getElementById('damage-form').addEventListener('submit', function(event) {
-      document.getElementById('image-data').value = canvas.toDataURL();
-      setTimeout(() => {
-        alert("Form submitted successfully!");
-        document.getElementById('damage-form').reset();
-        image.onload();
-      }, 500);
-    });
   </script>
 </body>
 </html>
