@@ -23,8 +23,7 @@
       font-weight: bold;
     }
     input[type="text"],
-    input[type="email"],
-    textarea {
+    input[type="email"] {
       width: 100%;
       padding: 8px;
       margin-bottom: 15px;
@@ -50,9 +49,7 @@
   </style>
 </head>
 <body>
-  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-
-  <form id="damage-form" action="https://script.google.com/macros/s/AKfycbzp7mV1TmBJBOrgXg78CQUeK-c9UUQpTFkbz5jGkDEJVSeFRxd9Sv9N1vMqi8_DqT0h/exec" method="POST" target="hidden_iframe" onsubmit="prepareImage()">
+  <form id="damage-form">
     <label for="customerName">Customer Name:</label>
     <input type="text" name="customerName" id="customerName" required>
 
@@ -90,9 +87,8 @@
     <input type="text" name="priceAgreed" id="priceAgreed">
 
     <canvas id="damageCanvas" width="500" height="500"></canvas>
-    <input type="hidden" name="imageDataURL" id="imageDataURL">
 
-    <button type="submit">Submit</button>
+    <button type="button" onclick="submitForm()">Submit</button>
   </form>
 
   <script>
@@ -128,9 +124,31 @@
       [lastX, lastY] = [e.offsetX, e.offsetY];
     });
 
-    function prepareImage() {
-      const dataUrl = canvas.toDataURL('image/png');
-      document.getElementById('imageDataURL').value = dataUrl;
+    function submitForm() {
+      const form = document.getElementById('damage-form');
+      const formData = new FormData(form);
+
+      const imageDataURL = canvas.toDataURL('image/png');
+      formData.append('imageDataURL', imageDataURL);
+
+      const scriptUrl = "https://script.google.com/macros/s/AKfycbzp7mV1TmBJBOrgXg78CQUeK-c9UUQpTFkbz5jGkDEJVSeFRxd9Sv9N1vMqi8_DqT0h/exec";
+      const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(scriptUrl);
+
+      fetch(proxyUrl, {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.text())
+      .then(data => {
+        alert("Form submitted successfully.");
+        form.reset();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+      })
+      .catch(error => {
+        console.error("Submission failed:", error);
+        alert("Submission failed: " + error);
+      });
     }
   </script>
 </body>
