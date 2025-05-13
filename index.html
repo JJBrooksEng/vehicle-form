@@ -49,7 +49,8 @@
   </style>
 </head>
 <body>
-  <form id="damage-form">
+  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+  <form id="damage-form" action="https://script.google.com/macros/s/AKfycbzp7mV1TmBJBOrgXg78CQUeK-c9UUQpTFkbz5jGkDEJVSeFRxd9Sv9N1vMqi8_DqT0h/exec" method="POST" target="hidden_iframe" onsubmit="prepareImage()">
     <label for="customerName">Customer Name:</label>
     <input type="text" name="customerName" id="customerName" required>
 
@@ -87,8 +88,9 @@
     <input type="text" name="priceAgreed" id="priceAgreed">
 
     <canvas id="damageCanvas" width="500" height="500"></canvas>
+    <input type="hidden" name="imageDataURL" id="imageDataURL">
 
-    <button type="button" onclick="submitForm()">Submit</button>
+    <button type="submit">Submit</button>
   </form>
 
   <script>
@@ -124,31 +126,9 @@
       [lastX, lastY] = [e.offsetX, e.offsetY];
     });
 
-    function submitForm() {
-      const form = document.getElementById('damage-form');
-      const formData = new FormData(form);
-
+    function prepareImage() {
       const imageDataURL = canvas.toDataURL('image/png');
-      formData.append('imageDataURL', imageDataURL);
-
-      const scriptUrl = "https://script.google.com/macros/s/AKfycbzp7mV1TmBJBOrgXg78CQUeK-c9UUQpTFkbz5jGkDEJVSeFRxd9Sv9N1vMqi8_DqT0h/exec";
-      const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(scriptUrl);
-
-      fetch(proxyUrl, {
-        method: "POST",
-        body: formData
-      })
-      .then(response => response.text())
-      .then(data => {
-        alert("Form submitted successfully.");
-        form.reset();
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-      })
-      .catch(error => {
-        console.error("Submission failed:", error);
-        alert("Submission failed: " + error);
-      });
+      document.getElementById('imageDataURL').value = imageDataURL;
     }
   </script>
 </body>
