@@ -150,8 +150,10 @@
     canvas.addEventListener('touchstart', (e) => {
       const touch = e.touches[0];
       const rect = canvas.getBoundingClientRect();
-      lastX = touch.clientX - rect.left;
-      lastY = touch.clientY - rect.top;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      lastX = (touch.clientX - rect.left) * scaleX;
+      lastY = (touch.clientY - rect.top) * scaleY;
       drawing = true;
     });
 
@@ -162,8 +164,10 @@
       e.preventDefault();
       const touch = e.touches[0];
       const rect = canvas.getBoundingClientRect();
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (touch.clientX - rect.left) * scaleX;
+      const y = (touch.clientY - rect.top) * scaleY;
       ctx.strokeStyle = 'red';
       ctx.lineWidth = 2;
       ctx.beginPath();
