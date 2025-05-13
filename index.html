@@ -129,6 +129,19 @@
     function prepareImage() {
       const imageDataURL = canvas.toDataURL('image/png');
       document.getElementById('imageDataURL').value = imageDataURL;
+
+      setTimeout(() => {
+        // Show confirmation
+        const successMsg = document.createElement('p');
+        successMsg.textContent = "✅ Submission complete.";
+        successMsg.style.color = 'green';
+        document.getElementById('damage-form').appendChild(successMsg);
+
+        // Reset form and canvas
+        document.getElementById('damage-form').reset();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+      }, 1000);
     }
   </script>
 </body>
