@@ -1,43 +1,72 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Vehicle Damage Report</title>
+  <meta charset="UTF-8">
+  <title>Vehicle Damage Form</title>
+  <style>
+    form { max-width: 600px; margin: auto; font-family: sans-serif; }
+    label { display: block; margin-top: 10px; }
+    canvas { display: block; margin-top: 15px; border: 1px solid #000; }
+    button { margin-top: 15px; padding: 10px 15px; }
+  </style>
 </head>
 <body>
   <form id="damage-form">
-    <label>Customer Name: <input type="text" name="customerName" required></label><br>
-    <label>Contact Number: <input type="text" name="contactNumber"></label><br>
-    <label>Email Address: <input type="email" name="email"></label><br>
-    <label>Vehicle Make: <input type="text" name="vehicleMake"></label><br>
-    <label>Vehicle Model: <input type="text" name="vehicleModel"></label><br>
-    <label>Vehicle Registration: <input type="text" name="vehicleReg"></label><br>
-    <label>Description of Repairs Required:<br><textarea name="repairDescription"></textarea></label><br>
-    <label>Replacement Parts Required:<br><textarea name="replacementParts"></textarea></label><br>
-    <label>Paint Type: <input type="text" name="paintType"></label><br>
-    <label>Estimated Workshop Hours: <input type="text" name="estimatedHours"></label><br>
-    <label>Dates Available: <input type="text" name="availableDates"></label><br>
-    <label>Price Agreed (if applicable): <input type="text" name="priceAgreed"></label><br><br>
+    <label>Customer Name: <input type="text" name="customerName" required></label>
+    <label>Contact Number: <input type="text" name="contactNumber"></label>
+    <label>Email Address: <input type="email" name="email"></label>
+    <label>Vehicle Make: <input type="text" name="vehicleMake"></label>
+    <label>Vehicle Model: <input type="text" name="vehicleModel"></label>
+    <label>Vehicle Registration: <input type="text" name="vehicleReg"></label>
+    <label>Description of Repairs Required:<br><textarea name="repairDescription"></textarea></label>
+    <label>Replacement Parts Required:<br><textarea name="replacementParts"></textarea></label>
+    <label>Paint Type: <input type="text" name="paintType"></label>
+    <label>Estimated Workshop Hours: <input type="text" name="estimatedHours"></label>
+    <label>Dates Available: <input type="text" name="availableDates"></label>
+    <label>Price Agreed (if applicable): <input type="text" name="priceAgreed"></label>
 
-    <canvas id="damageCanvas" width="300" height="150" style="border:1px solid #000000;"></canvas><br>
+    <label>Draw damage area below:</label>
+    <canvas id="damageCanvas" width="500" height="300"></canvas>
+
     <button type="button" onclick="submitForm()">Submit</button>
   </form>
 
   <script>
+    // Simple canvas drawing setup
+    const canvas = document.getElementById('damageCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('mouseout', () => drawing = false);
+    canvas.addEventListener('mousemove', draw);
+
+    function draw(event) {
+      if (!drawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      ctx.fillStyle = 'red';
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
     function submitForm() {
       const form = document.getElementById('damage-form');
       const formData = new FormData(form);
 
-      const canvas = document.getElementById('damageCanvas');
       const imageDataURL = canvas.toDataURL('image/png');
       formData.append('imageDataURL', imageDataURL);
 
-      fetch("https://script.google.com/macros/s/AKfycbzp7mV1TmBJBOrgXg78CQUeK-c9UUQpTFkbz5jGkDEJVSeFRxd9Sv9N1vMqi8_DqT0h/exec", {
+      fetch("https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID_HERE/exec", {
         method: "POST",
-        body: formData,
+        body: formData
       })
       .then(response => response.text())
-      .then(result => alert("Form submitted successfully."))
-      .catch(error => alert("Submission failed."));
+      .then(data => alert("Form submitted successfully."))
+      .catch(error => alert("Submission failed: " + error));
     }
   </script>
 </body>
