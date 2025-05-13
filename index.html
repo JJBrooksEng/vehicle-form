@@ -87,7 +87,6 @@
     <label for="priceAgreed">Price agreed if applicable:</label>
     <input type="text" name="priceAgreed" id="priceAgreed">
 
-    <label>Mark Damage on Diagram Below:</label>
     <canvas id="damageCanvas" width="500" height="300"></canvas>
 
     <button type="button" onclick="submitForm()">Submit</button>
@@ -99,6 +98,12 @@
     let drawing = false;
     let lastX = 0;
     let lastY = 0;
+    const backgroundImage = new Image();
+    backgroundImage.src = "https://i.ibb.co/v6yXvSrR/Vehicle-Diagram.jpg"; // Replace with your preferred diagram
+
+    backgroundImage.onload = function () {
+      ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+    };
 
     canvas.addEventListener('mousedown', (e) => {
       drawing = true;
