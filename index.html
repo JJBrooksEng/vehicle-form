@@ -111,10 +111,15 @@
     <button type="button" onclick="clearCanvas()">Clear Canvas</button>
     <input type="hidden" name="imageDataURL" id="imageDataURL">
 
-    <div style="position:absolute;left:-9999px;top:-9999px;">
+  <label for="vehicleVin">Vehicle VIN:</label>
+<input type="text" name="vehicleVin" id="vehicleVin">
+
+<!-- Honeypot (bots often fill it) -->
+<div style="position:absolute;left:-9999px;top:-9999px;">
   <label>Leave this blank</label>
   <input type="text" name="website" autocomplete="off">
 </div>
+
 
 
     <button type="submit">Submit</button>
@@ -208,4 +213,5 @@
 </script>
 </body>
 </html>
+
 
